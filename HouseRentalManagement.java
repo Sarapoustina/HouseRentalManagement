@@ -1,8 +1,7 @@
 import java.io.*;
 import java.util.*;
 
-class House implements Serializable {
-    private static final long serialVersionUID = 1L;
+class House {
     int id;
     String location;
     double price;
@@ -19,12 +18,11 @@ class House implements Serializable {
 
     @Override
     public String toString() {
-        return "ID: " + id + ", Location: " + location + ", Price: " + price + ", Bedrooms: " + bedrooms + ", Owner: " + ownerInfo;
+        return id + "," + location + "," + price + "," + bedrooms + "," + ownerInfo;
     }
 }
 
-class Tenant implements Serializable {
-    private static final long serialVersionUID = 1L;
+class Tenant {
     String name;
     String contact;
     String preferredLocation;
@@ -37,75 +35,90 @@ class Tenant implements Serializable {
 
     @Override
     public String toString() {
-        return "Name: " + name + ", Contact: " + contact + ", Preferred Location: " + preferredLocation;
+        return name + "," + contact + "," + preferredLocation;
     }
 }
 
 public class HouseRentalManagement {
     private static final String HOUSES_FILE = "houses.txt";
     private static final String TENANTS_FILE = "tenants.txt";
-    private List<House> houses = new ArrayList<>();
-    private List<Tenant> tenants = new ArrayList<>();
+    private final List<House> houses = new ArrayList<>();
+    private  final List<Tenant> tenants = new ArrayList<>();
 
     public HouseRentalManagement() {
         loadHouses();
         loadTenants();
     }
 
+    // Load Houses from a Text File
     private void loadHouses() {
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(HOUSES_FILE))) {
-            Object obj = ois.readObject();
-            if (obj instanceof List<?> tempList) {  // Pattern Matching for instanceof
-                houses = new ArrayList<>();
-                for (Object item : tempList) {
-                    if (item instanceof House house) {  // Pattern Matching
-                        houses.add(house);
-                    } else {
-                        System.out.println("Invalid data found in houses file.");
-                    }
+        houses.clear();
+        try (BufferedReader reader = new BufferedReader(new FileReader(HOUSES_FILE))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] data = line.split(",");
+                if (data.length == 5) {
+                    int id = Integer.parseInt(data[0]);
+                    String location = data[1];
+                    double price = Double.parseDouble(data[2]);
+                    int bedrooms = Integer.parseInt(data[3]);
+                    String ownerInfo = data[4];
+                    houses.add(new House(id, location, price, bedrooms, ownerInfo));
                 }
             }
+            System.out.println("✅ Houses loaded successfully.");
         } catch (FileNotFoundException e) {
             System.out.println("No previous house records found.");
-        } catch (IOException | ClassNotFoundException e) {
-            System.out.println("Error loading house records: " + e.getMessage());
+        } catch (IOException e) {
+            System.out.println("❌ Error loading house records: " + e.getMessage());
         }
     }
-    
+
+    // Load Tenants from a Text File
     private void loadTenants() {
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(TENANTS_FILE))) {
-            Object obj = ois.readObject();
-            if (obj instanceof List<?> tempList) {  // Pattern Matching for instanceof
-                tenants = new ArrayList<>();
-                for (Object item : tempList) {
-                    if (item instanceof Tenant tenant) {  // Pattern Matching
-                        tenants.add(tenant);
-                    } else {
-                        System.out.println("Invalid data found in tenants file.");
-                    }
+        tenants.clear();
+        try (BufferedReader reader = new BufferedReader(new FileReader(TENANTS_FILE))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] data = line.split(",");
+                if (data.length == 3) {
+                    String name = data[0];
+                    String contact = data[1];
+                    String preferredLocation = data[2];
+                    tenants.add(new Tenant(name, contact, preferredLocation));
                 }
             }
+            System.out.println("✅ Tenants loaded successfully.");
         } catch (FileNotFoundException e) {
             System.out.println("No previous tenant records found.");
-        } catch (IOException | ClassNotFoundException e) {
-            System.out.println("Error loading tenant records: " + e.getMessage());
+        } catch (IOException e) {
+            System.out.println("❌ Error loading tenant records: " + e.getMessage());
         }
     }
-    
 
+    // Save Houses to a Text File
     private void saveHouses() {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(HOUSES_FILE))) {
-            oos.writeObject(houses);
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(HOUSES_FILE))) {
+            for (House house : houses) {
+                writer.write(house.toString());
+                writer.newLine();
+            }
+            System.out.println("✅ Houses saved successfully.");
         } catch (IOException e) {
-            System.out.println("Error saving house records: " + e.getMessage());
+            System.out.println("❌ Error saving house records: " + e.getMessage());
         }
     }
 
+    // Save Tenants to a Text File
     private void saveTenants() {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(TENANTS_FILE))) {
-            oos.writeObject(tenants);
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(TENANTS_FILE))) {
+            for (Tenant tenant : tenants) {
+                writer.write(tenant.toString());
+                writer.newLine();
+            }
+            System.out.println("✅ Tenants saved successfully.");
         } catch (IOException e) {
-            System.out.println("Error saving tenant records: " + e.getMessage());
+            System.out.println("❌ Error saving tenant records: " + e.getMessage());
         }
     }
 
@@ -150,12 +163,26 @@ public class HouseRentalManagement {
         removeHouse(houseId);
     }
 
+    public void displaySavedHouses() {
+        System.out.println("\n📂 Saved Houses:");
+        for (House house : houses) {
+            System.out.println(house);
+        }
+    }
+
+    public void displaySavedTenants() {
+        System.out.println("\n📂 Saved Tenants:");
+        for (Tenant tenant : tenants) {
+            System.out.println(tenant);
+        }
+    }
+
     public static void main(String[] args) {
         HouseRentalManagement hrm = new HouseRentalManagement();
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
-            System.out.println("\n1. Add House\n2. Remove House\n3. Search Houses\n4. Register Tenant\n5. Book House\n6. Exit");
+            System.out.println("\n1. Add House\n2. Remove House\n3. Search Houses\n4. Register Tenant\n5. Book House\n6. Display Data\n7. Exit");
             System.out.print("Choose an option: ");
             
             try {
@@ -208,6 +235,10 @@ public class HouseRentalManagement {
                         hrm.bookHouse(bookId, bookTenant);
                     }
                     case 6 -> {
+                        hrm.displaySavedHouses();
+                        hrm.displaySavedTenants();
+                    }
+                    case 7 -> {
                         System.out.println("Exiting...");
                         scanner.close();
                         return;
@@ -221,3 +252,4 @@ public class HouseRentalManagement {
         }
     }
 }
+
