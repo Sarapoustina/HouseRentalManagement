@@ -1,0 +1,2 @@
+1,karur,2000.0,3,ram
+3,karur,400.0,1,rithik
