@@ -50,7 +50,7 @@ public class HouseRentalManagement {
         loadTenants();
     }
 
-    // Load Houses from a Text File
+
     private void loadHouses() {
         houses.clear();
         try (BufferedReader reader = new BufferedReader(new FileReader(HOUSES_FILE))) {
@@ -74,7 +74,7 @@ public class HouseRentalManagement {
         }
     }
 
-    // Load Tenants from a Text File
+ 
     private void loadTenants() {
         tenants.clear();
         try (BufferedReader reader = new BufferedReader(new FileReader(TENANTS_FILE))) {
@@ -96,7 +96,7 @@ public class HouseRentalManagement {
         }
     }
 
-    // Save Houses to a Text File
+   
     private void saveHouses() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(HOUSES_FILE))) {
             for (House house : houses) {
@@ -109,7 +109,7 @@ public class HouseRentalManagement {
         }
     }
 
-    // Save Tenants to a Text File
+    
     private void saveTenants() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(TENANTS_FILE))) {
             for (Tenant tenant : tenants) {
